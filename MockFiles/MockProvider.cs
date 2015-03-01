@@ -52,9 +52,9 @@ namespace MockFiles
         /// Creates Json file from output of method
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="classInstance"></param>
-        /// <param name="func"></param>
-        /// <param name="result"></param>
+        /// <param name="classInstance">Object that implements interface to be stubbed</param>
+        /// <param name="func">Delegate definition of method on object</param>
+        /// <param name="result">Output data that will be stored as stub in Json</param>
         public static void RegisterStub<T>(T classInstance, Delegate func, object result)
         {
             var className = typeof(T).GetInterfaces()[0].Name.Split('.').Last();
