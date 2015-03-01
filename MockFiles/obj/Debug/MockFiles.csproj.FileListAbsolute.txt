@@ -1,0 +1,9 @@
+\\vmware-host\Shared Folders\yegengovender\Projects\Github\MockFiles\MockFiles\obj\Debug\MockFiles.csprojResolveAssemblyReference.cache
+\\vmware-host\Shared Folders\yegengovender\Projects\Github\MockFiles\MockFiles\bin\Debug\MockFiles.dll
+\\vmware-host\Shared Folders\yegengovender\Projects\Github\MockFiles\MockFiles\bin\Debug\MockFiles.pdb
+\\vmware-host\Shared Folders\yegengovender\Projects\Github\MockFiles\MockFiles\bin\Debug\Castle.Core.dll
+\\vmware-host\Shared Folders\yegengovender\Projects\Github\MockFiles\MockFiles\bin\Debug\Newtonsoft.Json.dll
+\\vmware-host\Shared Folders\yegengovender\Projects\Github\MockFiles\MockFiles\bin\Debug\Castle.Core.xml
+\\vmware-host\Shared Folders\yegengovender\Projects\Github\MockFiles\MockFiles\bin\Debug\Newtonsoft.Json.xml
+\\vmware-host\Shared Folders\yegengovender\Projects\Github\MockFiles\MockFiles\obj\Debug\MockFiles.dll
+\\vmware-host\Shared Folders\yegengovender\Projects\Github\MockFiles\MockFiles\obj\Debug\MockFiles.pdb
