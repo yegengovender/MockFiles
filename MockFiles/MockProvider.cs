@@ -48,6 +48,13 @@ namespace MockFiles
             return new MethodInterceptor(interceptor);
         }
 
+        /// <summary>
+        /// Creates Json file from output of method
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="classInstance"></param>
+        /// <param name="func"></param>
+        /// <param name="result"></param>
         public static void RegisterStub<T>(T classInstance, Delegate func, object result)
         {
             var className = typeof(T).GetInterfaces()[0].Name.Split('.').Last();

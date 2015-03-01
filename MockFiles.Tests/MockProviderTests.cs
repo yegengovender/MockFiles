@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MockFiles.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class MockProviderTests
     {
         [TestMethod]
         public void TestMethod1()
