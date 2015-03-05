@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Castle.DynamicProxy;
+using MockFiles.Castle;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -13,41 +15,6 @@ namespace MockFiles
 
     public static class MockProvider
     {
-        public static T GetMock<T>() where T : class
-        {
-            var interfaceType = typeof(T);
-            IInterceptor[] interceptors = GetInterceptors(interfaceType);
-            var generator = new ProxyGenerator();
-            var proxy = generator.CreateInterfaceProxyWithoutTarget(interfaceType, new ProxyGenerationOptions(), interceptors);
-            var x = proxy as T;
-            return x;
-        }
-
-        private static MethodInterceptor[] GetInterceptors(Type interfaceType)
-        {
-            var interceptors = new List<MethodInterceptor>();
-
-            foreach (var method in interfaceType.GetMethods())
-            {
-                var className = interfaceType.Name;
-                var methodName = method.Name;
-                var returnType = method.ReturnType;
-                var file = string.Format("{0}.{1}.json", className, methodName);
-                if (!File.Exists(file)) continue;
-
-                interceptors.Add(GetMethodInterceptor(file, returnType));
-            }
-            return interceptors.ToArray();
-        }
-
-        private static MethodInterceptor GetMethodInterceptor(string file, Type returnType)
-        {
-            var json = File.ReadAllText(file);
-            var returnObj = JsonConvert.DeserializeObject(json, returnType);
-            var interceptor = new Func<object, object>(z => returnObj);
-            return new MethodInterceptor(interceptor);
-        }
-
         /// <summary>
         /// Creates Json file from output of method
         /// </summary>
@@ -64,11 +31,65 @@ namespace MockFiles
             serializer.Converters.Add(new JavaScriptDateTimeConverter());
             serializer.NullValueHandling = NullValueHandling.Ignore;
 
-            using (StreamWriter sw = new StreamWriter(string.Format(@"{0}.{1}.json", className, methodName)))
+            string paramsSuffix = ParamsSuffix(func.GetMethodInfo().GetParameters());
+            using (StreamWriter sw = new StreamWriter(MockFileName(className, methodName, paramsSuffix)))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 serializer.Serialize(writer, result);
             }
+        }
+
+        private static string MockFileName(string className, string methodName, string paramsSuffix)
+        {
+            return string.Format(@"{0}.{1}{2}.json", className, methodName, paramsSuffix);
+        }
+
+        private static string ParamsSuffix(ParameterInfo[] getParameters)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var parameterInfo in getParameters)
+            {
+                sb.Append("_" + parameterInfo.ParameterType.Name);
+            }
+
+            return sb.ToString();
+        }
+
+        public static T GetMock<T>() where T : class
+        {
+            var interfaceType = typeof(T);
+            IInterceptor[] interceptors = GetInterceptors(interfaceType);
+            var generator = new ProxyGenerator();
+            var options = new ProxyGenerationOptions { Selector = new InterceptorSelector() };
+            var proxy = generator.CreateInterfaceProxyWithoutTarget(interfaceType, options, interceptors);
+            var x = proxy as T;
+            return x;
+        }
+
+        private static MethodInterceptor[] GetInterceptors(Type interfaceType)
+        {
+            var interceptors = new List<MethodInterceptor>();
+
+            foreach (var method in interfaceType.GetMethods())
+            {
+                var className = interfaceType.Name;
+                var methodName = method.Name;
+                var returnType = method.ReturnType;
+                string paramsSuffix = ParamsSuffix(method.GetParameters());
+                var file = MockFileName(className, methodName, paramsSuffix);
+                if (!File.Exists(file)) continue;
+
+                interceptors.Add(GetMethodInterceptor(file, method, returnType));
+            }
+            return interceptors.ToArray();
+        }
+
+        private static MethodInterceptor GetMethodInterceptor(string file, MethodInfo method, Type returnType)
+        {
+            var json = File.ReadAllText(file);
+            var returnObj = JsonConvert.DeserializeObject(json, returnType);
+            return new MethodInterceptor(method, returnObj);
         }
     }
 }

@@ -9,10 +9,10 @@ namespace MockFiles.Tests
         private readonly List<Member> _students = new List<Member>
         {
             new Member {Id = 1, FirstName = "John", LastName = "Lennon", IsActive = true},
-            new Member {Id = 1, FirstName = "Paul", LastName = "McCartney", IsActive = true},
-            new Member {Id = 1, FirstName = "George", LastName = "Harrison", IsActive = true},
-            new Member {Id = 1, FirstName = "Ringo", LastName = "Star", IsActive = true},
-            new Member {Id = 1, FirstName = "Pete", LastName = "Best", IsActive = false}
+            new Member {Id = 2, FirstName = "Paul", LastName = "McCartney", IsActive = true},
+            new Member {Id = 3, FirstName = "George", LastName = "Harrison", IsActive = true},
+            new Member {Id = 4, FirstName = "Ringo", LastName = "Star", IsActive = true},
+            new Member {Id = 5, FirstName = "Pete", LastName = "Best", IsActive = false}
         };
         public List<Member> GetMembers()
         {

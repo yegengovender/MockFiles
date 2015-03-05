@@ -46,8 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Castle\InterceptorSelector.cs" />
+    <Compile Include="Castle\MethodInterceptor.cs" />
     <Compile Include="MockProvider.cs" />
-    <Compile Include="MethodInterceptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
