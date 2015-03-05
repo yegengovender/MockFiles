@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using Castle.DynamicProxy;
 using MockFiles.Castle;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace MockFiles
 {
@@ -25,36 +20,11 @@ namespace MockFiles
         public static void RegisterStub<T>(T classInstance, Delegate func, object result)
         {
             var className = typeof(T).GetInterfaces()[0].Name.Split('.').Last();
-            var methodName = func.GetMethodInfo().Name;
+            var methodInfo = func.GetMethodInfo();
 
-            var serializer = new JsonSerializer();
-            serializer.Converters.Add(new JavaScriptDateTimeConverter());
-            serializer.NullValueHandling = NullValueHandling.Ignore;
-
-            string paramsSuffix = ParamsSuffix(func.GetMethodInfo().GetParameters());
-            using (StreamWriter sw = new StreamWriter(MockFileName(className, methodName, paramsSuffix)))
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-                serializer.Serialize(writer, result);
-            }
+            FileHelper.CreateJsonFromMethod<T>(className, methodInfo, result);
         }
 
-        private static string MockFileName(string className, string methodName, string paramsSuffix)
-        {
-            return string.Format(@"{0}.{1}{2}.json", className, methodName, paramsSuffix);
-        }
-
-        private static string ParamsSuffix(ParameterInfo[] getParameters)
-        {
-            var sb = new StringBuilder();
-
-            foreach (var parameterInfo in getParameters)
-            {
-                sb.Append("_" + parameterInfo.ParameterType.Name);
-            }
-
-            return sb.ToString();
-        }
 
         public static T GetMock<T>() where T : class
         {
@@ -71,22 +41,9 @@ namespace MockFiles
         {
             var className = interfaceType.Name;
             return interfaceType.GetMethods()
-                .Select(method => new MethodInterceptor(method, GetObjectFromJson(className, method)))
+                .Select(method => new MethodInterceptor(method, FileHelper.GetObjectFromJson(className, method)))
                 .ToArray();
         }
 
-        private static object GetObjectFromJson(string className, MethodInfo method)
-        {
-            var methodName = method.Name;
-            var returnType = method.ReturnType;
-            string paramsSuffix = ParamsSuffix(method.GetParameters());
-            var file = MockFileName(className, methodName, paramsSuffix);
-
-            var returnObj = File.Exists(file)
-                ? JsonConvert.DeserializeObject(File.ReadAllText(file), returnType)
-                : new Exception(string.Format("Json File was not created for method [{0}] in type [{1}]", methodName, className));
-
-            return returnObj;
-        }
     }
 }
