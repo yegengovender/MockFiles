@@ -47,17 +47,12 @@ namespace MockFiles.Tests
 
             var band = new Band();
             var members = band.GetMembers();
-            var activeMembers = band.GetMembersByStatus(true);
             MockProvider.RegisterStub(band, new Func<List<Member>>(band.GetMembers), members);
-            //MockProvider.RegisterStub(band, new Func<bool, List<Member>>(band.GetMembersByStatus), activeMembers);
 
             var mockBand = MockProvider.GetMock<IBand>();
             var stubMembers = mockBand.GetMembers();
-            //var stubActiveMembers = mockBand.GetMembersByStatus(true);
 
             Assert.AreEqual(members.Count, stubMembers.Count);
-            //Assert.AreEqual(activeMembers.Count, stubActiveMembers.Count);
-
         }
 
         [TestMethod]
@@ -67,7 +62,6 @@ namespace MockFiles.Tests
             DeleteFile("IBand.GetMembersByStatus_Boolean.json");
 
             var band = new Band();
-            var members = band.GetMembers();
             var activeMembers = band.GetMembersByStatus(true);
             MockProvider.RegisterStub(band, new Func<bool, List<Member>>(band.GetMembersByStatus), activeMembers);
 
@@ -76,6 +70,25 @@ namespace MockFiles.Tests
 
             Assert.AreEqual(activeMembers.Count, stubActiveMembers.Count);
 
+        }
+
+        [TestMethod]
+        public void TestGetMockThrowsExceptionWhenInvokingMethodWithoutStub()
+        {
+            try
+            {
+                DeleteFile("IBand.GetMembersByStatus.json");
+                DeleteFile("IBand.GetMembersByStatus_Boolean.json");
+
+                var mockBand = MockProvider.GetMock<IBand>();
+                mockBand.GetMembersByStatus(true);
+
+                Assert.Fail("Exception not thrown");
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual("Json File was not created for method [GetMembersByStatus] in type [IBand]", e.Message);
+            }
         }
 
         private static void DeleteFile(string file)

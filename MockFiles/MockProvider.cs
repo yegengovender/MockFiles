@@ -69,27 +69,24 @@ namespace MockFiles
 
         private static MethodInterceptor[] GetInterceptors(Type interfaceType)
         {
-            var interceptors = new List<MethodInterceptor>();
-
-            foreach (var method in interfaceType.GetMethods())
-            {
-                var className = interfaceType.Name;
-                var methodName = method.Name;
-                var returnType = method.ReturnType;
-                string paramsSuffix = ParamsSuffix(method.GetParameters());
-                var file = MockFileName(className, methodName, paramsSuffix);
-                if (!File.Exists(file)) continue;
-
-                interceptors.Add(GetMethodInterceptor(file, method, returnType));
-            }
-            return interceptors.ToArray();
+            var className = interfaceType.Name;
+            return interfaceType.GetMethods()
+                .Select(method => new MethodInterceptor(method, GetObjectFromJson(className, method)))
+                .ToArray();
         }
 
-        private static MethodInterceptor GetMethodInterceptor(string file, MethodInfo method, Type returnType)
+        private static object GetObjectFromJson(string className, MethodInfo method)
         {
-            var json = File.ReadAllText(file);
-            var returnObj = JsonConvert.DeserializeObject(json, returnType);
-            return new MethodInterceptor(method, returnObj);
+            var methodName = method.Name;
+            var returnType = method.ReturnType;
+            string paramsSuffix = ParamsSuffix(method.GetParameters());
+            var file = MockFileName(className, methodName, paramsSuffix);
+
+            var returnObj = File.Exists(file)
+                ? JsonConvert.DeserializeObject(File.ReadAllText(file), returnType)
+                : new Exception(string.Format("Json File was not created for method [{0}] in type [{1}]", methodName, className));
+
+            return returnObj;
         }
     }
 }

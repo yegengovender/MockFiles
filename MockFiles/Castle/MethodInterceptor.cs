@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Castle.DynamicProxy;
 
 namespace MockFiles.Castle
@@ -21,6 +22,10 @@ namespace MockFiles.Castle
 
         public void Intercept(IInvocation invocation)
         {
+            if (_returnValue.GetType() == typeof(Exception))
+            {
+                throw new Exception(((Exception)_returnValue).Message);
+            }
             invocation.ReturnValue = _returnValue;
         }
       }
