@@ -35,6 +35,29 @@
 <a id="mockfiles" class="anchor" href="#mockfiles" aria-hidden="true"><span class="octicon octicon-link"></span></a>MockFiles</h1>
 
 <p>Helper for C# testing. Create json mock data from your integration tests, and re-use them on the fly in your unit tests.</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>In your integration tests, stub out your return data using <em>MockProvider.RegisterStub</em>. The class must implement an interface.</p>
+
+<div class="highlight highlight-c#"><pre>            <span class="pl-k">var</span> band = <span class="pl-s">new</span> Band(); <span class="pl-c">// implements IBand</span>
+            <span class="pl-k">var</span> members = band.GetMembers();
+            MockProvider.RegisterStub(band, <span class="pl-s">new</span> Func&lt;List&lt;Member&gt;&gt;(band.GetMembers), members);
+            <span class="pl-c">/// Creates file "IBand.GetMembers.json"</span></pre></div>
+
+<p>Once the json files exist in your test folder. Use them as much as you want in your unit tests by creating mocks using <em>MockProvider.GetMock</em> where T is the Interface to be used.</p>
+
+<div class="highlight highlight-c#"><pre>            <span class="pl-k">var</span> mockBand = MockProvider.GetMock&lt;IBand&gt;();
+            <span class="pl-k">var</span> stubMembers = mockBand.GetMembers();</pre></div>
+
+<p>Methods with parameters will create json files with the signature described in the filename.
+eg. </p>
+
+<pre><code>var members = band.GetMembersByStatus(true);
+MockProvider.RegisterStub(band, new Func&lt;bool, List&lt;Member&gt;&gt;(band.GetMembersByStatus), members); 
+// will create a json file named "IBand.GetMembersByStatus_Boolean.json"
+</code></pre>
         </section>
 
         <footer>
