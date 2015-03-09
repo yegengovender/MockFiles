@@ -2,6 +2,12 @@
 
 Helper for C# testing. Create json mock data from your integration tests, and re-use them on the fly in your unit tests.
 
+## Installation
+Download source and reference MockFiles.dll or install via Nuget
+```
+PM> Install-Package MockFiles
+```
+
 ## Usage
 
 In your integration tests, stub out your return data using *MockProvider.RegisterStub*. The class must implement an interface.
